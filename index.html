@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TLC — Ultimate Complete Football Platform</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Vector Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for Market Value History Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; background-color: #070a0f; color: #f3f4f6; }
+        .glass-card { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.07); }
+        .glass-input { background: rgba(7, 10, 15, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gold-gradient { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .emerald-glow { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+        .amber-glow { box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
+        /* Smooth Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070a0f; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-amber-500 selection:text-black">
+
+    <!-- ========================================== -->
+    <!-- 1. CINEMATIC INTRO SCREEN (SECTION 2)      -->
+    <!-- ========================================== -->
+    <div id="intro-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black transition-all duration-1000">
+        <div class="absolute inset-0 bg-cover bg-center opacity-30 scale-105 transition-transform duration-10000 transform hover:scale-100" style="background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070a0f] via-[#070a0f]/60 to-[#070a0f]"></div>
+        
+        <div class="relative z-10 text-center max-w-3xl px-6 space-y-6">
+            <div class="inline-block p-3 rounded-full bg-amber-500/10 border border-amber-500/20 mb-2 animate-pulse">
+                <i data-lucide="trophy" class="w-10 h-10 text-amber-400"></i>
+            </div>
+            <h1 class="text-7xl font-black tracking-wider text-white uppercase">TLC <span class="gold-gradient">FOOTBALL</span></h1>
+            <p class="text-gray-300 text-xl font-light max-w-xl mx-auto leading-relaxed">
+                مرحباً بك في المنصة الشاملة لإدارة كرة القدم، المحفظة المالية، سوق الانتقالات، والإحصائيات السينمائية.
+            </p>
+            <div class="pt-4">
+                <button onclick="enterPlatform()" class="px-10 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-lg rounded-full shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 mx-auto">
+                    <span>دخول عالم TLC</span>
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. GLOBAL HEADER & NAVIGATION (SECTION 3)  -->
+    <!-- ========================================== -->
+    <header class="glass-card sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between border-b border-gray-800/80">
+        <div class="flex items-center gap-6">
+            <!-- Hidden Admin Trigger: Click 10 times on "T" -->
+            <button onclick="handleAdminSecretClick()" class="text-2xl font-black tracking-wider text-white select-none focus:outline-none flex items-center gap-1 group">
+                <span id="secret-trigger" class="text-amber-500 transition-colors group-hover:text-amber-400">T</span><span>LC</span>
+            </button>
+            
+            <nav class="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-300 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800">
+                <button onclick="switchTab('feed')" class="px-4 py-2 rounded-lg hover:text-amber-400 hover:bg-gray-800/50 transition">الشبكة الاجتماعية</button>
+                <button onclick="switchTab('matches')" class="px-4 py-2 rounded-lg hover:text-amber-400 hover:bg-gray-800/50 transition">مركز المباريات</button>
+                <button onclick="switchTab('market')" class="px-4 py-2 rounded-lg hover:text-amber-400 hover:bg-gray-800/50 transition">سوق الانتقالات</button>
+                <button onclick="switchTab('profile')" class="px-4 py-2 rounded-lg hover:text-amber-400 hover:bg-gray-800/50 transition">ملف اللاعب</button>
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Secret Revealed Admin Button -->
+            <button id="admin-login-btn" onclick="openAdminModal()" class="hidden text-xs bg-red-600/90 hover:bg-red-600 text-white px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-red-600/20">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                <span>تسجيل الأدمن</span>
+            </button>
+
+            <button onclick="openRegisterModal()" class="text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>طلب انضمام لاعب</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- 3. MAIN DASHBOARD AREA                     -->
+    <!-- ========================================== -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- SIDEBAR: CAREER SUMMARY & WALLET -->
+        <aside class="space-y-6">
+            <!-- Player Card Summary -->
+            <div class="glass-card rounded-3xl p-6 text-center relative overflow-hidden amber-glow">
+                <div class="w-24 h-24 mx-auto rounded-full bg-gray-800 border-2 border-amber-500 overflow-hidden mb-4 shadow-xl">
+                    <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=MS7" alt="Player Avatar" class="w-full h-full object-cover">
+                </div>
+                <h3 id="user-name" class="font-bold text-xl text-white">لاعب غير مسجل</h3>
+                <p id="user-club" class="text-xs text-amber-400 font-medium mb-4">في انتظار تفعيل الحساب</p>
+                
+                <div class="grid grid-cols-2 gap-3 text-xs bg-gray-950/60 p-3.5 rounded-2xl border border-gray-800">
+                    <div class="space-y-1">
+                        <span class="block text-gray-500 font-medium">القيمة السوقية</span>
+                        <span id="user-market-value" class="font-bold text-sm text-amber-400">€0</span>
+                    </div>
+                    <div class="space-y-1 border-r border-gray-800 pr-2">
+                        <span class="block text-gray-500 font-medium">رصيد المحفظة</span>
+                        <span id="user-wallet" class="font-bold text-sm text-emerald-400">€0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global League Mini Standings -->
+            <div class="glass-card rounded-3xl p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <h4 class="font-bold text-sm text-gray-200 flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+                        <span>ترتيب الدوري الدوري</span>
+                    </h4>
+                    <span class="text-xs text-gray-500">الجولة 12</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center p-2 rounded-xl bg-gray-900/40 border border-gray-800">
+                        <span class="font-bold text-white flex items-center gap-2"><span class="w-4 text-amber-400 font-black">1</span> الملكي FC</span>
+                        <span class="text-amber-400 font-bold">28 ن</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-xl bg-gray-900/20">
+                        <span class="font-bold text-gray-300 flex items-center gap-2"><span class="w-4 text-gray-500 font-black">2</span> أساطير TLC</span>
+                        <span class="text-gray-400">24 ن</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEWPORTS -->
+        <section class="lg:col-span-3 space-y-6">
+            
+            <!-- TAB 1: TLC SOCIAL NETWORK -->
+            <div id="tab-feed" class="space-y-4">
+                <div class="glass-card p-5 rounded-3xl space-y-3">
+                    <textarea id="post-input" placeholder="ما هي آخر مستجدات تدريباتك أو مباراتك القادمة؟" class="w-full glass-input rounded-2xl p-4 text-sm focus:outline-none focus:border-amber-500 text-white resize-none h-24 transition"></textarea>
+                    <div class="flex justify-between items-center pt-1">
+                        <button class="text-gray-400 hover:text-amber-400 text-xs flex items-center gap-2 transition px-3 py-1.5 rounded-lg hover:bg-gray-800/40">
+                            <i data-lucide="image" class="w-4 h-4 text-amber-400"></i>
+                            <span>إرفاق صورة / فيديو</span>
+                        </button>
+                        <button onclick="createPost()" class="bg-amber-500 hover:bg-amber-600 text-black px-6 py-2.5 rounded-xl font-bold text-xs transition shadow-lg shadow-amber-500/10 flex items-center gap-2">
+                            <span>نشر التغريدة</span>
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="posts-container" class="space-y-4">
+                    <!-- Dynamic Posts Render Here -->
+                </div>
+            </div>
+
+            <!-- TAB 2: MATCH CENTER & AUTOMATIC RATING ENGINE (SECTION 8 & 20) -->
+            <div id="tab-matches" class="hidden space-y-6">
+                <div class="glass-card p-6 rounded-3xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="swords" class="w-5 h-5 text-amber-400"></i>
+                            <span>محاكي تقييم المباريات الآلي (Match Center Engine)</span>
+                        </h2>
+                        <span class="text-xs bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full border border-amber-500/20">خوارزمية (5.0 - 10.0)</span>
+                    </div>
+                    
+                    <!-- Stats Input Form for Auto Rating Test -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-950/60 p-4 rounded-2xl border border-gray-800 text-xs">
+                        <div>
+                            <label class="text-gray-400 block mb-1">الأهداف</label>
+                            <input type="number" id="stat-goals" value="1" min="0" class="w-full glass-input p-2 rounded-lg text-white">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 block mb-1">التمريرات الحاسمة</label>
+                            <input type="number" id="stat-assists" value="1" min="0" class="w-full glass-input p-2 rounded-lg text-white">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 block mb-1">التدخلات الناجحة</label>
+                            <input type="number" id="stat-tackles" value="3" min="0" class="w-full glass-input p-2 rounded-lg text-white">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 block mb-1">التصديات (للحراس)</label>
+                            <input type="number" id="stat-saves" value="0" min="0" class="w-full glass-input p-2 rounded-lg text-white">
+                        </div>
+                    </div>
+
+                    <button onclick="runAutoRatingSimulation()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                        <span>احتساب التقييم التلقائي وتحديث القيمة السوقية</span>
+                    </button>
+
+                    <div id="rating-result" class="hidden p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
+                        <span class="text-xs text-gray-400">التقييم التلقائي المحتسب:</span>
+                        <div id="rating-score" class="text-3xl font-black text-emerald-400">0.0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PLAYER PROFILE & MARKET VALUE GRAPH (SECTION 14 & 22) -->
+            <div id="tab-profile" class="hidden space-y-6">
+                <div class="glass-card p-6 rounded-3xl space-y-6">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i data-lucide="line-chart" class="w-5 h-5 text-amber-400"></i>
+                        <span>تطور القيمة السوقية (Market Value History)</span>
+                    </h3>
+                    
+                    <div class="w-full h-64">
+                        <canvas id="marketValueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- 4. MODALS (ADMIN LOGIN & REGISTRATION)     -->
+    <!-- ========================================== -->
+    
+    <!-- ADMIN ACCESS MODAL (SECTION 10) -->
+    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full p-6 rounded-3xl space-y-4 border border-red-500/30 shadow-2xl">
+            <div class="flex items-center gap-3 text-red-400 border-b border-gray-800 pb-3">
+                <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold">تسجيل دخول لوحة التحكم (Admin Panel)</h3>
+            </div>
+            <p class="text-xs text-gray-400 leading-relaxed">
+                هذا المدخل محمي بنظام أمان الـ Backend. لن يتم كشف كلمة المرور أو كتابتها كوداً للعامة.
+            </p>
+            <div class="space-y-3">
+                <input type="email" id="admin-email-input" placeholder="أدخل البريد المصرح له" class="w-full glass-input rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500">
+                <input type="password" id="admin-pass-input" placeholder="كلمة السر الخاصة بالـ Backend" class="w-full glass-input rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500">
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeAdminModal()" class="px-4 py-2 text-xs text-gray-400 hover:text-white transition">إلغاء</button>
+                <button onclick="verifyAdminAPI()" class="px-5 py-2.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition shadow-lg shadow-red-600/20">تأكيد الدخول</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAYER REGISTRATION MODAL (SECTION 8) -->
+    <div id="register-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full p-6 rounded-3xl space-y-4 border border-amber-500/30">
+            <h3 class="text-lg font-bold text-amber-400 border-b border-gray-800 pb-3">طلب الانضمام كلاعب في TLC</h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">اسم اللاعب الكامل</label>
+                    <input type="text" id="reg-name" class="w-full glass-input rounded-xl p-3 text-white">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">المركز الأساسي</label>
+                    <select id="reg-pos" class="w-full glass-input rounded-xl p-3 text-white">
+                        <option value="ST">مهاجم (ST)</option>
+                        <option value="MID">وسط (MID)</option>
+                        <option value="DEF">مدافع (DEF)</option>
+                        <option value="GK">حارس مرمى (GK)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeRegisterModal()" class="px-4 py-2 text-xs text-gray-400 hover:text-white">إلغاء</button>
+                <button onclick="submitRegistration()" class="px-5 py-2.5 text-xs bg-amber-500 text-black font-bold rounded-xl">إرسال الطلب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. SYSTEM JAVASCRIPT & DATABASE ENGINE     -->
+    <!-- ========================================== -->
+    <script>
+        // INDEXEDDB PERMANENT LOCAL STORAGE ENGINE (SECTION 2)
+        const DB_NAME = "TLC_MasterDB";
+        let db;
+
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("posts")) db.createObjectStore("posts", { keyPath: "id", autoIncrement: true });
+            if (!db.objectStoreNames.contains("registrations")) db.createObjectStore("registrations", { keyPath: "id", autoIncrement: true });
+        };
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            loadPosts();
+        };
+
+        // ADMIN SECRET TRIGGER ENGINE (10 CLICKS) (SECTION 10)
+        let secretClicks = 0;
+        function handleAdminSecretClick() {
+            secretClicks++;
+            if (secretClicks >= 10) {
+                document.getElementById('admin-login-btn').classList.remove('hidden');
+                alert("تم إظهار زر تسجيل دخول الأدمن الخفي بنجاح!");
+                secretClicks = 0;
+            }
+        }
+
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+        function openRegisterModal() { document.getElementById('register-modal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('register-modal').classList.add('hidden'); }
+
+        // MOCK BACKEND AUTHORIZATION VERIFICATION
+        function verifyAdminAPI() {
+            const email = document.getElementById('admin-email-input').value;
+            // Simulated secure check
+            if (email.trim().length > 5) {
+                alert("تم التحقق بنجاح! اسم الكاتب الرسمي المعلن للعامة سيكون دائماً: MS7 (تم حجب البريد عن العلن بنجاح).");
+                closeAdminModal();
+            }
+        }
+
+        // AUTOMATIC PLAYER RATING CALCULATOR (SECTION 20)
+        function runAutoRatingSimulation() {
+            const goals = parseInt(document.getElementById('stat-goals').value) || 0;
+            const assists = parseInt(document.getElementById('stat-assists').value) || 0;
+            const tackles = parseInt(document.getElementById('stat-tackles').value) || 0;
+            const saves = parseInt(document.getElementById('stat-saves').value) || 0;
+
+            let base = 6.0;
+            base += (goals * 0.9) + (assists * 0.6) + (tackles * 0.3) + (saves * 0.4);
+            const finalRating = Math.min(10.0, Math.max(5.0, base)).toFixed(1);
+
+            document.getElementById('rating-score').innerText = finalRating;
+            document.getElementById('rating-result').classList.remove('hidden');
+        }
+
+        // SOCIAL NETWORK POST ENGINE (SECTION 38)
+        function createPost() {
+            const content = document.getElementById('post-input').value;
+            if (!content.trim()) return;
+
+            const tx = db.transaction("posts", "readwrite");
+            const store = tx.objectStore("posts");
+            store.add({
+                author: "MS7",
+                content: content,
+                likes: 0,
+                time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+            });
+
+            tx.oncomplete = () => {
+                document.getElementById('post-input').value = '';
+                loadPosts();
+            };
+        }
+
+        function loadPosts() {
+            if (!db) return;
+            const tx = db.transaction("posts", "readonly");
+            const req = tx.objectStore("posts").getAll();
+            req.onsuccess = () => {
+                const posts = req.result.reverse();
+                const container = document.getElementById('posts-container');
+                container.innerHTML = posts.map(p => `
+                    <div class="glass-card p-5 rounded-3xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm text-white">${p.author}</span>
+                                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">رسمي</span>
+                            </div>
+                            <span class="text-xs text-gray-500">${p.time}</span>
+                        </div>
+                        <p class="text-sm text-gray-200 leading-relaxed">${p.content}</p>
+                        <div class="flex items-center gap-6 pt-2 text-xs text-gray-400 border-t border-gray-800">
+                            <button class="hover:text-amber-400 flex items-center gap-1.5"><i data-lucide="heart" class="w-4 h-4"></i> ${p.likes}</button>
+                            <button class="hover:text-amber-400 flex items-center gap-1.5"><i data-lucide="repeat" class="w-4 h-4"></i> إعادة نشر</button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            };
+        }
+
+        function submitRegistration() {
+            const name = document.getElementById('reg-name').value;
+            if (!name) return;
+
+            const tx = db.transaction("registrations", "readwrite");
+            tx.objectStore("registrations").add({ name, status: "PENDING", date: new Date().toISOString() });
+            tx.oncomplete = () => {
+                alert("تم إرسال طلب انضمامك بنجاح للأدمن للموافقة عليه!");
+                closeRegisterModal();
+            };
+        }
+
+        // NAVIGATION SWITCHER
+        function switchTab(tab) {
+            ['feed', 'matches', 'profile'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        }
+
+        function enterPlatform() {
+            document.getElementById('intro-screen').classList.add('opacity-0');
+            setTimeout(() => document.getElementById('intro-screen').classList.add('hidden'), 1000);
+        }
+
+        // CHART.JS INITIALIZATION FOR MARKET VALUE (SECTION 22)
+        window.onload = () => {
+            const ctx = document.getElementById('marketValueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [{
+                        label: 'القيمة السوقية (€)',
+                        data: [500000, 800000, 1200000, 1100000, 1800000, 2400000],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
+<!-- قسم البيانات المالية للاعب -->
+<div class="player-financial-section">
+  
+  <!-- 1. جدول المحفظة المالية (الملخص) -->
+  <div class="financial-card">
+    <h3>المحفظة المالية</h3>
+    <table class="financial-table">
+      <thead>
+        <tr>
+          <th>الرصيد الحالي</th>
+          <th>إجمالي الراتب الشهر</th>
+          <th>المكافآت</th>
+          <th>الخصومات / الغرامات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$15,500</td>
+          <td>$5,000</td>
+          <td>$1,200</td>
+          <td>$200-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. جدول سجل الرواتب -->
+  <div class="financial-card">
+    <h3>سجل الرواتب الشهرية</h3>
+    <table class="financial-table">
+      <thead>
+        <tr>
+          <th>الشهر / السنة</th>
+          <th>الراتب الأساسي</th>
+          <th>الحوافز</th>
+          <th>صافي المستلم</th>
+          <th>حالة الصرف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>أغسطس 2026</td>
+          <td>$5,000</td>
+          <td>$500</td>
+          <td>$5,500</td>
+          <td><span class="status paid">تم الصرف</span></td>
+        </tr>
+        <tr>
+          <td>يوليو 2026</td>
+          <td>$5,000</td>
+          <td>$0</td>
+          <td>$5,000</td>
+          <td><span class="status paid">تم الصرف</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. سجل المعاملات اليومية -->
+  <div class="financial-card">
+    <h3>سجل المعاملات اليومية</h3>
+    <table class="financial-table">
+      <thead>
+        <tr>
+          <th>التاريخ</th>
+          <th>نوع المعاملة</th>
+          <th>الوصف</th>
+          <th>المبلغ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026-09-15</td>
+          <td>مكافأة فوز</td>
+          <td>مكافأة المباراة الأخيرة</td>
+          <td class="income">+ $300</td>
+        </tr>
+        <tr>
+          <td>2026-09-10</td>
+          <td>خصم/غرامة</td>
+          <td>تأخير عن التدريب الجماعي</td>
+          <td class="expense">- $100</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
